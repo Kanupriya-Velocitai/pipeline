@@ -40,10 +40,10 @@ jobs:
           sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Set up PostgreSQL
-        uses: Harmon758/postgresql-action@v2.3.0
+        uses: Harmon758/postgresql-action@v2.2.0  # Updated version
         with:
-          postgresql version: '14'
-          db name: RetailPrice
+          postgresql_version: '14'
+          db_name: RetailPrice
           username: postgres
           password: root
 
@@ -55,6 +55,10 @@ jobs:
           DB_PASS: root
         run: |
           python ./scripts/selenium_fetch_data.py
+
+      - name: Clean up WebDriver
+        run: |
+          rm chromedriver chromedriver_linux64.zip
 
   build-and-deploy:
     runs-on: ubuntu-latest

@@ -6,11 +6,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import psycopg2
 import os
-import time
 
-# Path to ChromeDriver (use the default location set by GitHub Actions workflow)
-service = Service("/usr/local/bin/chromedriver")  # Use the installed ChromeDriver path
+# Path to ChromeDriver (installed in GitHub Actions)
+service = Service("/usr/local/bin/chromedriver")
 options = Options()
+
+# Add headless mode and required arguments for CI environments
+options.add_argument("--headless")  # Run Chrome in headless mode
+options.add_argument("--no-sandbox")  # Required for running as root in CI
+options.add_argument("--disable-dev-shm-usage")  # Prevent shared memory issues
+options.add_argument("--disable-gpu")  # Disable GPU acceleration
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option("useAutomationExtension", False)
@@ -21,10 +26,10 @@ driver = webdriver.Chrome(service=service, options=options)
 try:
     # Connect to PostgreSQL database
     conn = psycopg2.connect(
-        host="localhost",        # Update if your DB is hosted elsewhere
-        database="RetailPrice",  # Database name
-        user="postgres",         # Default username for PostgreSQL
-        password="root"          # Your password
+        host="localhost",
+        database="RetailPrice",
+        user="postgres",
+        password="root"
     )
     cursor = conn.cursor()
 

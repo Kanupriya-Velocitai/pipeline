@@ -3,25 +3,32 @@ name: Selenium Data Fetch Pipeline
 on:
   schedule:
     - cron: '0 * * * *'  # Run every hour
+  push:
+    branches:
+      - main  # Run the pipeline when code is pushed to the main branch
 
 jobs:
   fetch-and-store:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
+      # Install dependencies for Selenium and PostgreSQL connection
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install selenium psycopg2-binary
 
+      # Install Chrome and WebDriver for Selenium
       - name: Install Chrome and WebDriver
         run: |
           sudo apt-get update
@@ -31,7 +38,8 @@ jobs:
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
 
-      - name: Run Selenium Script
+      # Run the Selenium script to fetch data
+      - name: Run Selenium Script to Fetch Data
         env:
           DB_HOST: localhost
           DB_NAME: RetailPrice
@@ -39,4 +47,48 @@ jobs:
           DB_PASS: root
         run: |
           python scripts/selenium_fetch_data.py
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: fetch-and-store  # This step runs after the fetch-and-store job completes
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python environment for Django (frontend and backend)
+      - name: Set up Python for Django
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Install dependencies for Django
+      - name: Install Django dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Run database migrations (if any)
+      - name: Run Django migrations
+        run: |
+          python manage.py migrate
+
+      # Collect static files for deployment
+      - name: Collect static files
+        run: |
+          python manage.py collectstatic --noinput
+
+      # Build the project (if applicable, like front-end build for JSX)
+      - name: Build project
+        run: |
+          npm install
+          npm run build  # Assuming your frontend is built with npm
+
+      # Deploy the project (depending on your deployment setup)
+      - name: Deploy project
+        run: |
+          # Add your deploy script here, e.g. using SSH or another service
+          ./deploy.sh  # Replace this with your actual deploy command
+
 

@@ -16,6 +16,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Debug: List all files to verify structure
+      - name: List repository files
+        run: ls -R
+
       # Set up Python environment
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -46,7 +50,7 @@ jobs:
           DB_USER: postgres
           DB_PASS: root
         run: |
-          python scripts/selenium_fetch_data.py
+          python ./scripts/selenium_fetch_data.py  # Corrected the relative path
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -56,6 +60,10 @@ jobs:
       # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
+
+      # Debug: List all files to verify structure
+      - name: List repository files
+        run: ls -R
 
       # Set up Python environment for Django (frontend and backend)
       - name: Set up Python for Django
@@ -88,7 +96,5 @@ jobs:
       # Deploy the project (depending on your deployment setup)
       - name: Deploy project
         run: |
-          # Add your deploy script here, e.g. using SSH or another service
+          # Add your deploy script here, e.g., using SSH or another service
           ./deploy.sh  # Replace this with your actual deploy command
-
-

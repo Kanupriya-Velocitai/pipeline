@@ -1,0 +1,3 @@
+# Placeholder dependencies
+selenium
+psycopg2

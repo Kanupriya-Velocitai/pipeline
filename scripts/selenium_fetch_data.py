@@ -8,13 +8,14 @@ import psycopg2
 import os
 import time
 
-# Path to ChromeDriver
-service = Service("/path/to/chromedriver")  # Update to your ChromeDriver path
+# Path to ChromeDriver (use the default location set by GitHub Actions workflow)
+service = Service("/usr/local/bin/chromedriver")  # Use the installed ChromeDriver path
 options = Options()
 options.add_argument("--disable-blink-features=AutomationControlled")
 options.add_experimental_option("excludeSwitches", ["enable-automation"])
 options.add_experimental_option("useAutomationExtension", False)
 
+# Initialize the WebDriver
 driver = webdriver.Chrome(service=service, options=options)
 
 try:
@@ -89,3 +90,4 @@ finally:
     if 'conn' in locals():
         cursor.close()
         conn.close()
+
